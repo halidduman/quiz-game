@@ -377,6 +377,19 @@
       function selectAnswer(optionIndex) {
         const currentQuestion = gameState.questions[gameState.currentQuestion];
 
+        // Her grubun sadece bir kez cevap verebilmesini sağlayan kontrol
+        const groupAlreadyAnswered = Object.values(
+          currentQuestion.answers
+        ).some((groups) => groups.includes(gameState.currentGroup));
+
+        if (groupAlreadyAnswered) {
+          showInfo(
+            `Grup ${gameState.currentGroup + 1} zaten cevap verdi`,
+            "warning"
+          );
+          return;
+        }
+
         // Remove previous answer if exists
         Object.entries(currentQuestion.answers).forEach(([index, groups]) => {
           currentQuestion.answers[index] = groups.filter(
