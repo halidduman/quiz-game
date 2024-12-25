@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
 * {
   margin: 0;
   padding: 0;
@@ -36,6 +38,9 @@ body {
   border-radius: 0 50px 50px 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  font-family: "Roboto", serif;
+  font-weight: 900;
+  font-style: italic;
 }
 
 .current-group-indicator.pulse {
@@ -383,7 +388,7 @@ body {
 /*  */
 .score-board {
   margin: 20px 0;
-  padding: 25px 25px 15px 15px;
+  padding: 25px 25px 25px 40px;
   background-color: #000000;
   border: 5px solid #e37043;
 
@@ -399,9 +404,24 @@ body {
 
 .score-board h3 {
   margin: 0 0 10px;
-
+  font-family: "Orbitron", serif;
   font-size: 18px;
   text-align: center;
+}
+
+.score-board p {
+  font-family: "Orbitron", serif;
+}
+
+.score-item {
+  font-family: "Orbitron", serif;
+  margin-top: 10px;
+}
+
+.score-item-bold {
+  color: #e37043;
+  font-family: "Roboto", serif;
+  font-weight: 900;
 }
 
 .score-display {
@@ -411,8 +431,4 @@ body {
 
 #scoreScreen {
   display: none; /* İlk başta gizleniyor */
-}
-
-.score-board {
-  padding: 10px;
 }

@@ -165,11 +165,6 @@ function startTimer() {
 }
 
 function handleNextQuestion() {
-  if (!gameState.canProceed) {
-    showInfo("Lütfen tüm grupların cevap vermesini bekleyin.", "warning");
-    return;
-  }
-
   // Doğru şıkka renk ver
   const currentQuestion = gameState.questions[gameState.currentQuestion];
   const correctOption =
@@ -216,7 +211,7 @@ function updateScoreDisplay() {
     scoreDisplay.innerHTML = gameState.groups
       .map(
         (group) =>
-          `<div class="score-item">Grup ${group.id}: ${group.score} Puan</div>`
+          `<div class="score-item"><b class="score-item-bold">Grup ${group.id}:</b>  ${group.score} Puan</div>`
       )
       .join("");
   }
@@ -370,7 +365,7 @@ function endGame() {
 
   scoreScreen.innerHTML = `
     <div class="final-score-container">
-      <h1 class="final-score-title" >Oyun Sonu Sonuçları</h1>
+      <h1 class="final-score-title" >Skor Tablosu:</h1>
       ${topThreeHTML}
       ${otherGroupsHTML}
       <button class="final-score-btn" onclick="location.reload()">Yeniden Başlat</button>
