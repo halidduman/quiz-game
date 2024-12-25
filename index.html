@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Uygulaması</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: #f0f2f5;
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-top: 100px;
+      }
+
+      .current-group-indicator {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .current-group-indicator.pulse {
+        animation: pulse 0.5s ease;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .info-box {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .info-box.success {
+        background: #4caf50;
+        color: white;
+      }
+      .info-box.warning {
+        background: #ff9800;
+        color: white;
+      }
+      .info-box.error {
+        background: #f44336;
+        color: white;
+      }
+
+      .screen {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .setup-screen {
+        max-width: 400px;
+        margin: 50px auto;
+        text-align: center;
+      }
+
+      .group-select {
+        margin: 20px 0;
+        padding: 10px;
+        width: 200px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      .game-screen {
+        display: none;
+      }
+
+      .timer-bar {
+        height: 10px;
+        background: #ddd;
+        border-radius: 5px;
+        margin: 20px 0;
+        overflow: hidden;
+      }
+
+      .timer-progress {
+        height: 100%;
+        background: #4caf50;
+        width: 100%;
+        transition: width 1s linear;
+      }
+
+      .question {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .option {
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .option:hover {
+        background: #f5f5f5;
+      }
+      .option.correct {
+        background: #4caf50;
+        color: white;
+        border-color: #4caf50;
+      }
+      .option.wrong {
+        background: #f44336;
+        color: white;
+        border-color: #f44336;
+      }
+
+      .group-marker {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #2196f3;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 12px;
+        animation: pop 0.3s ease;
+      }
+
+      .control-buttons {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+      }
+
+      .group-reset-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .next-question-btn,
+      .group-reset-btn {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .next-question-btn:hover,
+      .group-reset-btn:hover {
+        background: #1976d2;
+      }
+
+      .next-question-btn {
+        display: none;
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(0);
+        }
+        70% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .score-screen {
+        display: none;
+        text-align: center;
+      }
+
+      /* ... (rest of the existing styles remain the same) ... */
+    </style>
+  </head>
+  <body>
+    <div class="current-group-indicator">Sıra: Grup 1</div>
+    <div class="info-box" style="display: none"></div>
+
+    <div class="container">
+      <div id="setupScreen" class="screen setup-screen">
+        <h1>Quiz Oyunu</h1>
+        <div>
+          <label for="groupCount">Grup Sayısı:</label>
+          <select id="groupCount" class="group-select">
+            <option value="2">2 Grup</option>
+            <option value="3">3 Grup</option>
+            <option value="4">4 Grup</option>
+            <option value="5">5 Grup</option>
+            <option value="6">6 Grup</option>
+            <option value="7">7 Grup</option>
+            <option value="8">8 Grup</option>
+            <option value="9">9 Grup</option>
+            <option value="10">10 Grup</option>
+          </select>
+        </div>
+        <button onclick="startGame()">Oyunu Başlat</button>
+      </div>
+
+      <div id="gameScreen" class="screen game-screen">
+        <div class="timer-bar">
+          <div class="timer-progress"></div>
+        </div>
+        <div class="question">Soru yükleniyor...</div>
+        <div class="options">
+          <div class="option" onclick="selectAnswer(0)">A</div>
+          <div class="option" onclick="selectAnswer(1)">B</div>
+          <div class="option" onclick="selectAnswer(2)">C</div>
+          <div class="option" onclick="selectAnswer(3)">D</div>
+        </div>
+      </div>
+
+      <div id="scoreScreen" class="screen score-screen">
+        <!-- ... (score screen content remains the same) ... -->
+      </div>
+    </div>
+
+    <div class="control-buttons">
+      <div class="group-reset-buttons"></div>
+      <button class="next-question-btn" onclick="handleNextQuestion()">
+        Sonraki Soru
+      </button>
+    </div>
+
+    <script>
+      let gameState = {
+        groups: [],
+        currentQuestion: 0,
+        currentGroup: 0,
+        timer: 60,
+        timerInterval: null,
+        canProceed: false,
+        questions: [
+          {
+            question: "Örnek Soru 1?",
+            options: ["A Şıkkı", "B Şıkkı", "C Şıkkı", "D Şıkkı"],
+            correct: 0,
+            answers: {},
+          },
+          {
+            question: "asdasda?",
+            options: ["A Şıkkı", "B Şıkkı", "C Şıkkı", "D Şıkkı"],
+            correct: 2,
+            answers: {},
+          },
+          {
+            question: "51515151?",
+            options: ["A Şıkkı", "B Şıkkı", "C Şıkkı", "D Şıkkı"],
+            correct: 2,
+            answers: {},
+          },
+          // ... (more questions)
+        ],
+      };
+
+      function showInfo(message, type) {
+        const infoBox = document.querySelector(".info-box");
+        infoBox.textContent = message;
+        infoBox.className = "info-box " + type;
+        infoBox.style.display = "block";
+
+        setTimeout(() => {
+          infoBox.style.display = "none";
+        }, 3000);
+      }
+
+      function updateGroupIndicator() {
+        const indicator = document.querySelector(".current-group-indicator");
+        indicator.textContent = `Sıra: Grup ${gameState.currentGroup + 1}`;
+        indicator.classList.remove("pulse");
+        void indicator.offsetWidth; // Trigger reflow
+        indicator.classList.add("pulse");
+      }
+
+      function startGame() {
+        const groupCount = parseInt(
+          document.getElementById("groupCount").value
+        );
+        gameState.groups = Array.from({ length: groupCount }, (_, i) => ({
+          id: i + 1,
+          score: 0,
+        }));
+
+        // Create reset buttons for each group
+        const resetButtons = document.querySelector(".group-reset-buttons");
+        gameState.groups.forEach((group) => {
+          const btn = document.createElement("button");
+          btn.className = "group-reset-btn";
+          btn.textContent = `G${group.id}`;
+          btn.onclick = () => resetGroupAnswer(group.id - 1);
+          resetButtons.appendChild(btn);
+        });
+
+        document.getElementById("setupScreen").style.display = "none";
+        document.getElementById("gameScreen").style.display = "block";
+
+        showInfo("Oyun başladı!", "success");
+        updateQuestion();
+        startTimer();
+      }
+
+      function resetGroupAnswer(groupIndex) {
+        const currentQuestion = gameState.questions[gameState.currentQuestion];
+
+        // Remove group's previous answer
+        Object.entries(currentQuestion.answers).forEach(
+          ([optionIndex, groups]) => {
+            currentQuestion.answers[optionIndex] = groups.filter(
+              (g) => g !== groupIndex
+            );
+          }
+        );
+
+        // Remove group marker
+        document.querySelectorAll(".group-marker").forEach((marker) => {
+          if (marker.textContent === `G${groupIndex + 1}`) {
+            marker.remove();
+          }
+        });
+
+        // Set current group to the reset group
+        gameState.currentGroup = groupIndex;
+        updateGroupIndicator();
+        showInfo(`Grup ${groupIndex + 1} cevabı sıfırlandı`, "warning");
+      }
+
+      function selectAnswer(optionIndex) {
+        const currentQuestion = gameState.questions[gameState.currentQuestion];
+
+        // Remove previous answer if exists
+        Object.entries(currentQuestion.answers).forEach(([index, groups]) => {
+          currentQuestion.answers[index] = groups.filter(
+            (g) => g !== gameState.currentGroup
+          );
+        });
+
+        // Add new answer
+        if (!currentQuestion.answers[optionIndex]) {
+          currentQuestion.answers[optionIndex] = [];
+        }
+        currentQuestion.answers[optionIndex].push(gameState.currentGroup);
+
+        // Update UI
+        document.querySelectorAll(".group-marker").forEach((marker) => {
+          if (marker.textContent === `G${gameState.currentGroup + 1}`) {
+            marker.remove();
+          }
+        });
+
+        const selectedOption =
+          document.querySelectorAll(".option")[optionIndex];
+        const groupMarker = document.createElement("div");
+        groupMarker.className = "group-marker";
+        groupMarker.textContent = `G${gameState.currentGroup + 1}`;
+        selectedOption.appendChild(groupMarker);
+
+        // Move to next group
+        gameState.currentGroup =
+          (gameState.currentGroup + 1) % gameState.groups.length;
+        updateGroupIndicator();
+
+        if (gameState.currentGroup === 0) {
+          gameState.canProceed = true;
+          document.querySelector(".next-question-btn").style.display = "block";
+        }
+
+        showInfo(`Grup ${gameState.currentGroup + 1}'in sırası`, "success");
+      }
+
+      function startTimer() {
+        const timerBar = document.querySelector(".timer-progress");
+        gameState.timer = 60;
+        clearInterval(gameState.timerInterval);
+
+        gameState.timerInterval = setInterval(() => {
+          gameState.timer--;
+          timerBar.style.width = `${(gameState.timer / 60) * 100}%`;
+
+          if (gameState.timer <= 0) {
+            clearInterval(gameState.timerInterval);
+            showInfo("Süre doldu!", "error");
+            handleNextQuestion();
+          }
+        }, 1000);
+      }
+
+      function handleNextQuestion() {
+        if (!gameState.canProceed) {
+          showInfo("Lütfen tüm grupların cevap vermesini bekleyin.", "warning");
+          return;
+        }
+
+        const currentQuestion = gameState.questions[gameState.currentQuestion];
+        Object.entries(currentQuestion.answers).forEach(
+          ([optionIndex, groups]) => {
+            groups.forEach((groupIndex) => {
+              if (parseInt(optionIndex) === currentQuestion.correct) {
+                gameState.groups[groupIndex].score++;
+              }
+            });
+          }
+        );
+
+        gameState.currentQuestion++;
+        if (gameState.currentQuestion >= gameState.questions.length) {
+          endGame();
+        } else {
+          gameState.currentGroup = 0;
+          gameState.canProceed = false;
+          document.querySelector(".next-question-btn").style.display = "none";
+          updateQuestion();
+          startTimer();
+        }
+      }
+
+      function updateQuestion() {
+        const currentQuestion = gameState.questions[gameState.currentQuestion];
+        document.querySelector(".question").textContent =
+          currentQuestion.question;
+
+        const options = document.querySelectorAll(".option");
+        options.forEach((option, index) => {
+          option.textContent = currentQuestion.options[index];
+          option.className = "option";
+        });
+
+        document
+          .querySelectorAll(".group-marker")
+          .forEach((marker) => marker.remove());
+      }
+
+      function endGame() {
+        clearInterval(gameState.timerInterval);
+        document.getElementById("gameScreen").style.display = "none";
+        const scoreScreen = document.getElementById("scoreScreen");
+        scoreScreen.style.display = "block";
+
+        const resultList = gameState.groups
+          .map((group) => `<p>Grup ${group.id}: ${group.score} puan</p>`)
+          .join("");
+        scoreScreen.innerHTML = `<h1>Oyun Bitti!</h1>${resultList}<button onclick="location.reload()">Yeniden Başlat</button>`;
+      }
+    </script>
+  </body>
+</html>
