@@ -379,3 +379,32 @@ body {
     background-color: #4caf50;
   }
 }
+
+/*  */
+.score-board {
+  margin: 20px 0;
+  padding: 25px 25px 15px 15px;
+  background-color: #000000;
+  border: 5px solid #e37043;
+
+  color: #fff;
+  border-radius: 5px;
+
+  max-width: 300px;
+  position: fixed;
+  top: 80px;
+  left: -5px;
+  border-radius: 0 50px 50px 0;
+}
+
+.score-board h3 {
+  margin: 0 0 10px;
+
+  font-size: 18px;
+  text-align: center;
+}
+
+.score-display {
+  font-size: 16px;
+  line-height: 1.5;
+}
