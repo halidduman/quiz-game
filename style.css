@@ -303,16 +303,19 @@ body {
 .gold {
   background-color: #ffd700;
   height: 250px;
+  color: #000000;
 }
 
 .silver {
   background-color: #c0c0c0;
   height: 200px;
+  color: #000000;
 }
 
 .bronze {
   background-color: #cd7f32;
   height: 150px;
+  color: #000000;
 }
 
 .other-groups {
