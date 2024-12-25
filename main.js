@@ -7,20 +7,20 @@ let gameState = {
   canProceed: false,
   questions: [
     {
-      question: "Örnek Soru 1?",
-      options: ["A Şıkkı", "B Şıkkı", "C Şıkkı", "D Şıkkı"],
+      question: "Dünya'nın en büyük okyanusu nedir?",
+      options: ["Pasifik", "Atlantik", "Hint", "Arktik"],
       correct: 0,
       answers: {},
     },
     {
-      question: "asdasda?",
-      options: ["A Şıkkı", "B Şıkkı", "C Şıkkı", "D Şıkkı"],
-      correct: 2,
+      question: "Python hangi yıl ortaya çıktı??",
+      options: ["1989", "1991", "2000", "2010"],
+      correct: 1,
       answers: {},
     },
     {
-      question: "51515151?",
-      options: ["A Şıkkı", "B Şıkkı", "C Şıkkı", "D Şıkkı"],
+      question: "Türkiye'nin başkenti hangisidir?",
+      options: ["İstanbul", "İzmir", "Ankara", "Antalya"],
       correct: 2,
       answers: {},
     },
@@ -212,8 +212,79 @@ function endGame() {
   const scoreScreen = document.getElementById("scoreScreen");
   scoreScreen.style.display = "block";
 
-  const resultList = gameState.groups
-    .map((group) => `<p>Grup ${group.id}: ${group.score} puan</p>`)
-    .join("");
-  scoreScreen.innerHTML = `<h1>Oyun Bitti!</h1>${resultList}<button onclick="location.reload()">Yeniden Başlat</button>`;
+  // Grupları puana göre sırala
+  const sortedGroups = gameState.groups.sort((a, b) => b.score - a.score);
+
+  // İlk 3 grubu ayrı işle, geri kalanları farklı
+  const topThreeGroups = sortedGroups.slice(0, 3);
+  const otherGroups = sortedGroups.slice(3);
+
+  const topThreeHTML = `
+    <div class="podium">
+      ${
+        topThreeGroups[1]
+          ? `
+        <div class="podium-item silver">
+          <div class="rank">2</div>
+          <div class="group-name">${topThreeGroups[1].id}. Grup</div>
+          <div class="group-score">${topThreeGroups[1].score} Puan</div>
+        </div>
+      `
+          : ""
+      }
+      
+      ${
+        topThreeGroups[0]
+          ? `
+        <div class="podium-item gold">
+          <div class="rank">1</div>
+          <div class="group-name">${topThreeGroups[0].id}. Grup</div>
+          <div class="group-score">${topThreeGroups[0].score} Puan</div>
+        </div>
+      `
+          : ""
+      }
+      
+      ${
+        topThreeGroups[2]
+          ? `
+        <div class="podium-item bronze">
+          <div class="rank">3</div>
+          <div class="group-name">${topThreeGroups[2].id}. Grup</div>
+          <div class="group-score">${topThreeGroups[2].score} Puan</div>
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
+
+  const otherGroupsHTML =
+    otherGroups.length > 0
+      ? `
+    <div class="other-groups">
+      <h3>Diğer Gruplar</h3>
+      ${otherGroups
+        .map(
+          (group, index) => `
+        <div class="other-group">
+          <span class="group-rank">${index + 4}.</span>
+          <span class="group-name">${group.id}. Grup</span>
+          <span class="group-score">${group.score} Puan</span>
+        </div>
+      `
+        )
+        .join("")}
+    </div>
+  `
+      : "";
+
+  scoreScreen.innerHTML = `
+    <div class="final-score-container">
+      <h1 class="final-score-title" >Oyun Sonu Sonuçları</h1>
+      ${topThreeHTML}
+      ${otherGroupsHTML}
+      <button class="final-score-btn" onclick="location.reload()">Yeniden Başlat</button>
+    </div>
+  `;
 }
