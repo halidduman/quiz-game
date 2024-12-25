@@ -211,12 +211,12 @@ function handleNextQuestion() {
 }
 
 function updateScoreDisplay() {
-  const scoreDisplay = document.querySelector(".score-display");
+  const scoreDisplay = document.querySelector(".score-board");
   if (scoreDisplay) {
     scoreDisplay.innerHTML = gameState.groups
       .map(
-        (group, index) =>
-          `<div class="score-item">Grup ${index + 1}: ${group.score} Puan</div>`
+        (group) =>
+          `<div class="score-item">Grup ${group.id}: ${group.score} Puan</div>`
       )
       .join("");
   }

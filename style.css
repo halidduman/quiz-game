@@ -408,3 +408,11 @@ body {
   font-size: 16px;
   line-height: 1.5;
 }
+
+#scoreScreen {
+  display: none; /* İlk başta gizleniyor */
+}
+
+.score-board {
+  padding: 10px;
+}
