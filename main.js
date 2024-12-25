@@ -170,25 +170,114 @@ function handleNextQuestion() {
     return;
   }
 
+  // Doğru şıkka renk ver
   const currentQuestion = gameState.questions[gameState.currentQuestion];
+  const correctOption =
+    document.querySelectorAll(".option")[currentQuestion.correct];
+  correctOption.classList.add("correct-answer");
+
+  // Skor güncellemesi
+  const correctGroups = [];
   Object.entries(currentQuestion.answers).forEach(([optionIndex, groups]) => {
-    groups.forEach((groupIndex) => {
-      if (parseInt(optionIndex) === currentQuestion.correct) {
-        gameState.groups[groupIndex].score++;
-      }
-    });
+    if (parseInt(optionIndex) === currentQuestion.correct) {
+      correctGroups.push(...groups);
+    }
   });
 
-  gameState.currentQuestion++;
-  if (gameState.currentQuestion >= gameState.questions.length) {
-    endGame();
-  } else {
-    gameState.currentGroup = 0;
-    gameState.canProceed = false;
-    document.querySelector(".next-question-btn").style.display = "none";
-    updateQuestion();
-    startTimer();
+  if (correctGroups.length > 0) {
+    correctGroups.forEach((groupIndex) => {
+      gameState.groups[groupIndex].score++;
+    });
   }
+
+  updateScoreDisplay();
+
+  // 2 saniye sonra bir sonraki soruya geç
+  setTimeout(() => {
+    correctOption.classList.remove("correct-answer");
+
+    gameState.currentQuestion++;
+    if (gameState.currentQuestion >= gameState.questions.length) {
+      endGame();
+    } else {
+      gameState.currentGroup = 0;
+      gameState.canProceed = false;
+      document.querySelector(".next-question-btn").style.display = "none";
+      clearScoreDisplay();
+      updateQuestion();
+      startTimer();
+    }
+  }, 2000);
+}
+
+function updateScoreDisplay() {
+  const scoreDisplay = document.querySelector(".score-display");
+  if (scoreDisplay) {
+    scoreDisplay.innerHTML = gameState.groups
+      .map(
+        (group, index) =>
+          `<div class="score-item">Grup ${index + 1}: ${group.score} Puan</div>`
+      )
+      .join("");
+  }
+}
+
+function clearScoreDisplay() {
+  const scoreDisplay = document.querySelector(".score-display");
+  if (scoreDisplay) {
+    scoreDisplay.innerHTML = ""; // Skor ekranını temizle
+  }
+}
+
+function updateQuestion() {
+  const currentQuestion = gameState.questions[gameState.currentQuestion];
+  document.querySelector(".question").textContent = currentQuestion.question;
+
+  const options = document.querySelectorAll(".option");
+  options.forEach((option, index) => {
+    option.textContent = currentQuestion.options[index];
+    option.className = "option";
+  });
+
+  document
+    .querySelectorAll(".group-marker")
+    .forEach((marker) => marker.remove());
+}
+
+function updateQuestion() {
+  const currentQuestion = gameState.questions[gameState.currentQuestion];
+  document.querySelector(".question").textContent = currentQuestion.question;
+
+  const options = document.querySelectorAll(".option");
+  options.forEach((option, index) => {
+    option.textContent = currentQuestion.options[index];
+    option.className = "option";
+  });
+
+  document
+    .querySelectorAll(".group-marker")
+    .forEach((marker) => marker.remove());
+
+  // Skor tablosu güncelleme
+  const scoreDisplay = document.querySelector(".score-display");
+  if (scoreDisplay) {
+    scoreDisplay.innerHTML = gameState.groups
+      .map(
+        (group) =>
+          `<div class="score-item">Grup ${group.id}: ${group.score} Puan</div>`
+      )
+      .join("");
+  }
+}
+
+function updateScoreBoard() {
+  const scoreBoard = document.querySelector(".score-board");
+  scoreBoard.innerHTML = gameState.groups
+    .map(
+      (group) =>
+        `<div class="score-item">Grup ${group.id}: ${group.score} Puan</div>`
+    )
+    .join("");
 }
 
 function updateQuestion() {
